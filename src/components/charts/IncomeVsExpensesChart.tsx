@@ -50,7 +50,7 @@ export default function IncomeVsExpensesChart({ data }: IncomeVsExpensesChartPro
               border: "1px solid rgb(226 232 240)",
               borderRadius: "0.5rem",
             }}
-            formatter={(value: number) => [formatCurrency(value), ""]}
+            formatter={(value: number | undefined) => [formatCurrency(value ?? 0), ""]}
             labelFormatter={(label) => `Period: ${label}`}
           />
           <Legend />

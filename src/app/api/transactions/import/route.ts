@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import type {
+  Transaction as PrismaTransaction,
+  Category as PrismaCategory,
+} from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { mapPrismaTransactionToTransaction } from "@/lib/api-mappers";
+
+type TransactionWithCategory = PrismaTransaction & { category: PrismaCategory };
 
 export async function POST(request: Request) {
   try {
@@ -26,10 +32,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const created: Awaited<ReturnType<typeof prisma.transaction.create>>[] = [];
+    const created: TransactionWithCategory[] = [];
 
     for (const t of rawTransactions) {
-      const hasAmount = t.amount !== undefined && t.amount !== null && !Number.isNaN(Number(t.amount));
+      const hasAmount =
+        t.amount !== undefined &&
+        t.amount !== null &&
+        !Number.isNaN(Number(t.amount));
       if (!t.type || !t.category || !hasAmount || !t.description || !t.date) {
         continue;
       }
@@ -41,7 +50,7 @@ export async function POST(request: Request) {
           description: t.description,
           date: new Date(t.date),
           recurring: Boolean(t.recurring),
-          frequency: t.recurring ? t.frequency ?? null : null,
+          frequency: t.recurring ? (t.frequency ?? null) : null,
           tags: Array.isArray(t.tags) ? t.tags : [],
         },
         include: { category: true },

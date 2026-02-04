@@ -49,7 +49,7 @@ export default function ExpenseByCategoryChart({
             cy="50%"
             outerRadius={90}
             label={({ name, percent }) =>
-              `${name} ${(percent * 100).toFixed(0)}%`
+              `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
             }
           >
             {data.map((_, index) => (
@@ -59,7 +59,7 @@ export default function ExpenseByCategoryChart({
               />
             ))}
           </Pie>
-          <Tooltip formatter={(value: number) => formatCurrency(value)} />
+          <Tooltip formatter={(value: number | undefined) => formatCurrency(value ?? 0)} />
           <Legend />
         </PieChart>
       </ResponsiveContainer>
