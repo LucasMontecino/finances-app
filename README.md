@@ -1,210 +1,180 @@
 # Finances App
 
-A personal finance application to track your expenses, incomes, liabilities, assets, and current balance.
+A personal finance application to track expenses, income, liabilities, assets, and current balance.
 
 ## Features
 
-### ✅ Sprint 1 - Core Transaction Management (COMPLETED)
+- **Transactions** – Add, edit, and delete transactions (Income, Expense, Asset, Liability) with categories, recurring options, and tags
+- **Transaction list** – Filter by type, category, date range; search by description or tags; sort by date or amount
+- **Dashboard** – Summary cards (Income, Expenses, Balance, Net Worth), recent transactions, quick actions
+- **Categories** – Pre-defined categories for all transaction types; seed script for default data
+- **Data** – PostgreSQL with Prisma; API routes for CRUD; database error banner with retry
 
-- **Transaction Management**
-  - Add, edit, and delete transactions
-  - Support for Income, Expenses, Assets, and Liabilities
-  - Recurring transactions with frequency options
-  - Tags for better organization
-  - Rich form validation with Zod
-
-- **Transaction List**
-  - Advanced filtering (by type, category, date range)
-  - Search by description or tags
-  - Sort by date or amount
-  - Real-time updates
-
-- **Dashboard**
-  - Financial summary cards (Income, Expenses, Balance, Net Worth)
-  - Recent transactions view
-  - Quick action buttons
-  - Real-time calculations
-
-- **Data Persistence**
-  - **PostgreSQL** database (local)
-  - **Prisma** ORM for type-safe access
-  - API routes for CRUD operations
-  - Seed script for default categories
-
-- **Navigation**
-  - Top navigation bar with Dashboard and Transactions
-  - Active link highlighting
-  - Database error banner with retry when DB is unavailable
-
-- **Categories**
-  - Pre-defined categories for all transaction types
-  - Income: Salary, Freelance, Investments, Gifts, Other
-  - Expenses: Housing, Food, Transport, Utilities, Entertainment, Healthcare, Shopping, Education, Other
-  - Assets: Cash, Savings, Investments, Property, Vehicles, Other
-  - Liabilities: Credit Card, Personal Loan, Mortgage, Car Loan, Student Loan, Other
+Sprint history and roadmap: [SPRINTS.md](./SPRINTS.md).
 
 ## Tech Stack
 
-- **React 19** - UI library
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Utility-first styling
-- **Prisma** - ORM for PostgreSQL
-- **PostgreSQL** - Local database
-- **React Hook Form** - Form management
-- **Zod** - Schema validation
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
+- **React 19** – UI
+- **Next.js 15** – App Router
+- **TypeScript** – Types
+- **Tailwind CSS** – Styling
+- **Prisma** – PostgreSQL ORM
+- **PostgreSQL** – Database
+- **React Hook Form** – Forms
+- **Zod** – Validation
+- **ESLint** + **Prettier** – Lint & format
 
 ## Getting Started
 
-1. Install dependencies:
+1. **Install dependencies**
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
-2. **Set up the local database** (PostgreSQL + Prisma):
+2. **Set up the database**
 
-See **[DATABASE_SETUP.md](./DATABASE_SETUP.md)** for full steps. Summary:
+   See [DATABASE_SETUP.md](./DATABASE_SETUP.md). Summary:
+   - Create a PostgreSQL database (e.g. `finances_app`)
+   - Copy `.env.example` to `.env` and set `DATABASE_URL`
+   - Run `npm run db:migrate` then `npm run db:seed`
 
-- Create a PostgreSQL database (e.g. `finances_app`).
-- Copy `.env.example` to `.env` and set `DATABASE_URL`.
-- Run `npm run db:migrate` then `npm run db:seed`.
+3. **Run the dev server**
 
-3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-```bash
-npm run dev
-```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+   Open [http://localhost:3000](http://localhost:3000).
 
 ## Pushing to GitHub
 
-1. Create a new repository on [GitHub](https://github.com/new) (do not add a README or .gitignore; the project already has them).
-2. From the project root, run:
+1. Create a new repository on [GitHub](https://github.com/new) (no README or .gitignore).
+2. From the project root:
 
-```bash
-git init
-git add .
-git commit -m "Initial commit: Finances app with local PostgreSQL"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/finances-app.git
-git push -u origin main
-```
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit: Finances app with local PostgreSQL"
+   git branch -M main
+   git remote add origin https://github.com/YOUR_USERNAME/finances-app.git
+   git push -u origin main
+   ```
 
-Replace `YOUR_USERNAME` and `finances-app` with your GitHub username and repo name. Your `.env` file is ignored by `.gitignore`, so your local `DATABASE_URL` is never uploaded.
+   Replace `YOUR_USERNAME` and `finances-app` with your GitHub username and repo name. `.env` is in `.gitignore` and is not uploaded.
 
 ## Deploying to Vercel
 
-1. Go to [vercel.com](https://vercel.com), sign in, and click **Add New → Project**.
-2. Import your GitHub repository (`finances-app`).
-3. Vercel will detect Next.js; keep the default build command (`npm run build` uses `prisma generate && next build`).
-4. **Environment variables:** Leave **DATABASE_URL** unset if you only want the app to run with your local PostgreSQL. The deployed site will load but API calls will show a database connection message. When you want the live site to use a database, add **DATABASE_URL** in Project Settings → Environment Variables with a hosted PostgreSQL URL (e.g. [Neon](https://neon.tech), [Vercel Postgres](https://vercel.com/storage/postgres), or [Supabase](https://supabase.com)).
-5. Click **Deploy**. After the build finishes, your app will be live.
+1. Go to [vercel.com](https://vercel.com) → **Add New** → **Project**.
+2. Import your GitHub repo (`finances-app`).
+3. Keep the default build command (`npm run build`).
+4. **Environment variables:** If `DATABASE_URL` is unset, the site loads but API calls return 500. To use your **local** PostgreSQL with the deployed app, see [Using your local PostgreSQL with Vercel](#using-your-local-postgresql-with-vercel) below. Otherwise set `DATABASE_URL` to a hosted PostgreSQL URL (e.g. [Neon](https://neon.tech), [Vercel Postgres](https://vercel.com/storage/postgres), [Supabase](https://supabase.com)).
+5. Click **Deploy**.
 
-You can keep using your local PostgreSQL for development; the Vercel deployment is independent.
+### Using your local PostgreSQL with Vercel
+
+The deployed app runs on Vercel; it cannot connect to `localhost` on your machine. To have the live site use your **local** database:
+
+1. **Expose PostgreSQL with a tunnel** (e.g. [ngrok](https://ngrok.com)):
+   - Install ngrok and create a free account.
+   - Start local PostgreSQL (e.g. port 5432 or 5433).
+   - Run: `ngrok tcp 5432` (use your actual port).
+   - Note the public host and port (e.g. `0.tcp.ngrok.io:12345`).
+
+2. **Build the connection string** (same user/password/database as in `.env`, but with ngrok host and port):
+
+   ```text
+   postgresql://postgres:YOUR_PASSWORD@0.tcp.ngrok.io:12345/finances_app?schema=public
+   ```
+
+   Replace host, port, password, and database name. URL-encode special characters in the password.
+
+3. **Set `DATABASE_URL` on Vercel:** Project → **Settings** → **Environment Variables** → add `DATABASE_URL` with the value above → **Redeploy**.
+
+4. **Keep the tunnel running** when you want the live site to use your local DB. If the ngrok URL changes, update `DATABASE_URL` on Vercel and redeploy.
+
+**Security:** While the tunnel is running, the database is reachable from the internet. Use a strong password and only run the tunnel when needed.
+
+**Still getting 500?** The app uses plain TCP (`ssl: false`) and a 15s timeout for ngrok URLs. Check: (1) **Vercel logs** – Deployments → select deployment → **Functions** → open a failing request (e.g. `/api/transactions`) → **Logs** to see the real error. (2) **Connection string** – Use the host and port from `ngrok tcp 5432` (e.g. `0.tcp.ngrok.io:12345`); no `tcp://` in the URL; URL-encode special characters in the password. (3) **Redeploy** after changing `DATABASE_URL` on Vercel.
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Generate Prisma client and build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
-- `npm run db:generate` - Generate Prisma client
-- `npm run db:push` - Push schema to database (no migrations)
-- `npm run db:migrate` - Run migrations
-- `npm run db:seed` - Seed default categories
-- `npm run db:studio` - Open Prisma Studio (database GUI)
+| Command                | Description                                     |
+| ---------------------- | ----------------------------------------------- |
+| `npm run dev`          | Start development server                        |
+| `npm run build`        | Generate Prisma client and build for production |
+| `npm run start`        | Start production server                         |
+| `npm run lint`         | Run ESLint                                      |
+| `npm run format`       | Format with Prettier                            |
+| `npm run format:check` | Check formatting                                |
+| `npm run db:generate`  | Generate Prisma client                          |
+| `npm run db:push`      | Push schema (no migrations)                     |
+| `npm run db:migrate`   | Run migrations                                  |
+| `npm run db:seed`      | Seed default categories                         |
+| `npm run db:studio`    | Open Prisma Studio                              |
 
 ## Project Structure
 
-```
+```text
 finances-app/
+├── prisma/
+│   ├── schema.prisma
+│   ├── migrations/
+│   └── seed.ts
 ├── src/
-│   ├── app/                      # Next.js App Router
-│   │   ├── layout.tsx            # Root layout with providers
-│   │   ├── page.tsx              # Dashboard page
-│   │   ├── transactions/         # Transactions page
-│   │   └── globals.css           # Global styles
+│   ├── app/                    # Next.js App Router
+│   │   ├── api/                # API routes (transactions, categories, summary)
+│   │   ├── layout.tsx
+│   │   ├── page.tsx            # Dashboard
+│   │   ├── transactions/
+│   │   └── globals.css
 │   ├── components/
-│   │   ├── common/               # Reusable UI components
-│   │   ├── containers/           # Container components
-│   │   ├── forms/                # Form components
-│   │   │   └── TransactionForm.tsx
-│   │   ├── modals/               # Modal components
-│   │   │   └── EditTransactionModal.tsx
-│   │   ├── singles/              # Single-purpose components
-│   │   └── transactions/         # Transaction-specific components
-│   │       └── TransactionList.tsx
+│   │   ├── charts/
+│   │   ├── common/
+│   │   ├── containers/
+│   │   ├── forms/
+│   │   ├── layout/
+│   │   ├── modals/
+│   │   ├── singles/
+│   │   └── transactions/
 │   ├── context/
-│   │   └── FinanceContext.tsx    # Global state management
 │   ├── lib/
-│   │   ├── categories.ts         # Category definitions
-│   │   ├── storage.ts            # localStorage utilities
-│   │   └── utils.ts              # Helper functions
-│   └── types.ts                  # TypeScript type definitions
-├── eslint.config.mjs             # ESLint configuration
-├── .prettierrc                   # Prettier configuration
-└── tailwind.config.ts            # Tailwind configuration
+│   └── types.ts
+├── .env.example
+├── DATABASE_SETUP.md
+├── SPRINTS.md                  # Sprint history & roadmap
+└── README.md
 ```
 
 ## Usage
 
-### Adding a Transaction
+### Adding a transaction
 
-1. Navigate to the Transactions page
-2. Click "Add Transaction"
-3. Select transaction type (Income/Expense/Asset/Liability)
-4. Choose a category
-5. Enter amount, description, and date
-6. Optionally mark as recurring and add tags
-7. Click "Add Transaction"
+1. Go to **Transactions**.
+2. Click **Add Transaction**.
+3. Choose type (Income / Expense / Asset / Liability), category, amount, description, date.
+4. Optionally set recurring and tags.
+5. Click **Add Transaction**.
 
-### Filtering Transactions
+### Filtering and search
 
-Use the filter panel to:
+- Filter by type, category, date range.
+- Search by description or tags.
+- Sort by date or amount.
 
-- Filter by transaction type
-- Filter by category
-- Set date range
-- Search by description or tags
-- Sort by date or amount
+### Editing and deleting
 
-### Editing/Deleting Transactions
-
-- Click "Edit" on any transaction to modify it
-- Click "Delete" to remove a transaction (with confirmation)
+- Use **Edit** on a transaction to change it.
+- Use **Delete** to remove it (with confirmation).
 
 ## Data Storage
 
-Data is stored in **PostgreSQL** (local by default). Your `.env` with `DATABASE_URL` is not committed to Git, so you keep using your local database for development. The deployed app on Vercel will only connect to a database if you set `DATABASE_URL` in Vercel’s environment variables (e.g. a hosted Postgres); otherwise the live site will show a database connection message.
-
-## Coming Next
-
-### Sprint 2 - Dashboard Enhancement
-
-- Summary cards with trends
-- Basic charts (income vs expenses)
-- Category breakdown visualization
-- Monthly/yearly views
-
-### Sprint 3 - Advanced Features
-
-- Budget tracking
-- Financial goals
-- Recurring transaction automation
-- Advanced analytics
+Data is stored in **PostgreSQL**. Your `.env` (with `DATABASE_URL`) is not committed; use it for local development. The deployed app on Vercel uses the database only if `DATABASE_URL` is set in Vercel (e.g. via ngrok tunnel to your local DB or a hosted Postgres).
 
 ## Development
 
-Built with modern web technologies and best practices:
-
-- Type-safe with TypeScript
-- Form validation with Zod
-- React Context for state management
-- Responsive design with Tailwind CSS
-- ESLint + Prettier for code quality
+- TypeScript for type safety
+- Zod for validation
+- React Context for app state
+- Tailwind for layout and styling
+- ESLint and Prettier for code quality

@@ -7,7 +7,20 @@ function createPrismaClient() {
   const connectionString =
     process.env.DATABASE_URL ??
     "postgresql://postgres:postgres@localhost:5432/finances_app?schema=public";
-  const adapter = new PrismaPg({ connectionString });
+
+  // Serverless (e.g. Vercel) + ngrok tunnel: pg may try SSL for non-localhost and fail.
+  // Use plain TCP (ssl: false) and a longer timeout for tunneled connections.
+  const isTunnel =
+    connectionString.includes("ngrok") || connectionString.includes("tcp.ngrok");
+  const poolConfig: { connectionString: string; ssl?: false; connectionTimeoutMillis?: number } = {
+    connectionString,
+    ...(isTunnel && {
+      ssl: false,
+      connectionTimeoutMillis: 15000,
+    }),
+  };
+
+  const adapter = new PrismaPg(poolConfig);
   return new PrismaClient({
     adapter,
     log:
